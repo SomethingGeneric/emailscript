@@ -32,15 +32,8 @@ annoying_senders = [
 ]
 
 if __name__ == "__main__":
-    break_uid = None
-    if os.path.exists("last_uid"):
-        break_uid = int(open("last_uid").read())
-    this_uid = 0
     with MailBox(host).login(email, password, mb_name) as mailbox:
         for msg in mailbox.fetch(reverse=True):
-            this_uid = msg.uid
-            if break_uid != None and msg.uid == break_uid:
-                break
             print(msg.subject, msg.date_str, msg.from_, msg.uid)
             for phrase in annoying:
                 if phrase in msg.subject:
@@ -50,5 +43,3 @@ if __name__ == "__main__":
                 if sender in msg.from_:
                     print("Deleting b/c sent by " + sender)
                     mailbox.delete(msg.uid)
-    with open("last_uid", "w") as f:
-        f.write(str(this_uid))

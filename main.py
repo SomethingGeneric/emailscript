@@ -14,28 +14,8 @@ mb_name = "INBOX"
 
 discord_url = open(".webhook").read().strip()
 
-annoying = [
-    "Price alert",
-    "Cron",
-    "Google Alert",
-    "ACM TechNews",
-    "Postmates",
-    "Dreamstime",
-    "DoorDash",
-    "Private_photos",
-    "Private_photo",
-    "Profile_with_photo",
-    "Direct_message",
-    "Private_profile",
-]
-annoying_senders = [
-    "donotreply@speedydock.com",
-    "no-reply@email.alltrails.com",
-    "info@i.drop.com",
-    "diagnosis@mail.codealchemi.com",
-    "news@georgetowncupcake.com"
-]
-
+annoying = open("annoying").read().strip().split("\n")
+annoying_senders = open("annoying_senders").read().strip().split("\n")
 
 def do_log(text):
     print(text)

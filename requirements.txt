@@ -1,2 +1,4 @@
 imap-tools
 discord-webhook
+py-cord
+discord-pretty-help

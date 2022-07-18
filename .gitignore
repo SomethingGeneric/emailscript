@@ -1,1 +1,3 @@
 .password
+.webhook
+program.log*

@@ -42,15 +42,6 @@ bot.help_command = PrettyHelp(
 @bot.event
 async def on_ready():
     print("Bot go brr")
-    cogs_dir = "cogs"
-    for extension in [
-        f.replace(".py", "") for f in listdir(cogs_dir) if isfile(join(cogs_dir, f))
-    ]:
-        try:
-            bot.load_extension(cogs_dir + "." + extension)
-        except Exception as e:
-            print(f"Failed to load extension {extension}.")
-            traceback.print_exc()
     await bot.change_presence(
         activity=discord.Activity(
             type=discord.ActivityType.watching,
@@ -123,6 +114,9 @@ async def do_clean(ctx):
 async def email_task():
     if email_task.current_loop != 0:
         await email_clean()
+    else:
+        email_channel = bot.get_channel(LOG_CHANNEL_ID)
+        await email_channel.send("Email task enabled.")
 
 
 async def email_clean():

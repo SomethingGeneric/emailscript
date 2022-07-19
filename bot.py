@@ -116,7 +116,6 @@ async def block_phrase(ctx, phrase=None):
 
 @bot.command()
 async def do_clean(ctx):
-    await ctx.send("Starting to clean email")
     await email_clean()
 
 
@@ -130,6 +129,7 @@ async def email_clean():
     annoying = open("annoying").read().strip().split("\n")
     annoying_senders = open("annoying_senders").read().strip().split("\n")
     email_channel = bot.get_channel(LOG_CHANNEL_ID)
+    await email_channel.send("Starting to clean email.")
     deleted_total = 0
     msgs_total = 0
     with MailBox(host).login(email, password, mb_name) as mailbox:

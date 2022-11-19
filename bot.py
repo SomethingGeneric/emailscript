@@ -1,4 +1,4 @@
-import traceback,os,shutil
+import traceback, os, shutil
 from os import listdir
 from os.path import isfile
 from random import randint
@@ -10,16 +10,10 @@ from discord.ext import commands, tasks
 # Kind've discord related
 from pretty_help import DefaultMenu, PrettyHelp
 
-# Pip
-from imap_tools import MailBox
+from domail import cope
 
 OWNER_ID = 117445905572954121
 LOG_CHANNEL_ID = 973422153095606272
-host = "tar.black"
-port = 993 # assumes SSL/TLS
-email = "matt@tar.black"
-password = open(".password").read().strip()
-mb_name = "INBOX"
 
 intents = discord.Intents.default()
 intents.members = True
@@ -37,6 +31,7 @@ bot.help_command = PrettyHelp(
     no_category="Commands", navigation=helpmenu, color=discord.Colour.blurple()
 )
 
+e = cope()
 
 # Startup event
 @bot.event
@@ -44,8 +39,7 @@ async def on_ready():
     print("Bot go brr")
     await bot.change_presence(
         activity=discord.Activity(
-            type=discord.ActivityType.watching,
-            name=" you fuck up."
+            type=discord.ActivityType.watching, name=" you fuck up."
         )
     )
     email_task.start()
@@ -73,9 +67,7 @@ async def removecog(ctx, name):
             print("Disabled cog: " + name)
             await ctx.send("Done", "Disabled: `" + name + "`.")
         except Exception as e:
-            await ctx.send(
-                "Something went wrong: `" + str(e) + "`."
-            )
+            await ctx.send("Something went wrong: `" + str(e) + "`.")
     else:
         await ctx.send("You can't use this.")
 
@@ -124,23 +116,11 @@ async def email_clean():
     annoying_senders = open("annoying_senders").read().strip().split("\n")
     email_channel = bot.get_channel(LOG_CHANNEL_ID)
     await email_channel.send("Starting to clean email.")
-    deleted_total = 0
-    msgs_total = 0
-    with MailBox(host).login(email, password, mb_name) as mailbox:
-        for msg in mailbox.fetch(reverse=True):
-            msgs_total += 1
-            print(msg.subject, msg.date_str, msg.from_, msg.uid)
-            for phrase in annoying:
-                if phrase in msg.subject:
-                    mailbox.delete(msg.uid)
-                    deleted_total += 1
-            for sender in annoying_senders:
-                if sender in msg.from_:
-                    mailbox.delete(msg.uid)
-                    deleted_total += 1
-            if not msg.subject.isascii():
-                mailbox.delete(msg.uid)
-                deleted_total += 1
+
+    a_total, deleted_total, msgs_total = e.go()
+
+    await email_channel.send(f"Checked {str(a_total)} accounts.")
+
     if deleted_total != 0:
         await email_channel.send("Total deleted: " + str(deleted_total))
     else:

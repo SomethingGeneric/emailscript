@@ -1,4 +1,6 @@
+__pycache__/
 .password
 .webhook
 .token
-program.log*
+.account_*
+*.log

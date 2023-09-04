@@ -1,3 +1,8 @@
+"""
+This module contains the code that actually processes the emails in each account, 
+and decides wether to delete or forward them.
+"""
+
 import os
 import toml
 
@@ -5,31 +10,43 @@ from imap_tools import MailBox
 from discord_webhook import DiscordWebhook
 
 
-class cope:
+class Cope:
+    """
+    Docstring these nuts pylint
+    """
+
     def __init__(self, do_discord=False):
         self.do_discord = False
         if do_discord:
             self.do_discord = True
-            self.discord_url = open(".webhook").read().strip()
+            with open(".webhook", encoding="utf-8").read().strip() as durl:
+                self.discord_url = durl
 
-        self.annoying = open("annoying").read().strip().split("\n")
-        self.annoying_senders = open("annoying_senders").read().strip().split("\n")
+        with open("annoying", encoding="utf-8").read().strip().split("\n") as ann:
+            self.annoying = ann
+
+        with open("annoying_senders", encoding="utf-8").read().strip().split(
+            "\n"
+        ) as senders:
+            self.annoying_senders = senders
 
     def log(self, text, host):
+        """Something worth noting from account <host>, sending to discord if enabled and to file."""
         print(text)
-        with open(f"email-{host}.log", "a+") as f:
-            f.write(text + "\n")
+        with open(f"email-{host}.log", "a+", encoding="utf-8") as thefile:
+            thefile.write(text + "\n")
         if self.do_discord:
             webhook = DiscordWebhook(
                 url=self.discord_url, content=text, rate_limit_retry=True
             )
             webhook.execute()
 
-    def go(self):
+    def process(self):
+        """The main function which loops through configured accounts."""
         account_fns = []
-        for f in os.listdir():
-            if ".account_" in f:
-                account_fns.append(f)
+        for files in os.listdir():
+            if ".account_" in files:
+                account_fns.append(files)
 
         grand_total = 0
         grand_msgs_total = 0
@@ -37,8 +54,17 @@ class cope:
         for account_file in account_fns:
             acc = toml.load(account_file)
             print(f"Working on {acc['host']}")
-            forwarding_senders = open("forwarding_senders").read().strip().split("\n")
-            forwarding_subjects = open("forwarding_subjects").read().strip().split("\n")
+            forwarding_senders = ""
+            with open("forwarding_senders", encoding="utf-8").read().strip().split(
+                "\n"
+            ) as frdsndrs:
+                forwarding_senders = frdsndrs
+
+            forwarding_subjects = ""
+            with open("forwarding_subjects", encoding="utf-8").read().strip().split(
+                "\n"
+            ) as fsubjs:
+                forwarding_subjects = fsubjs
 
             deleted_total = 0
             msgs_total = 0
@@ -104,11 +130,10 @@ class cope:
             if deleted_total != 0:
                 self.log(f"Total deleted: {str(deleted_total)}", acc["host"])
             else:
-                self.log(f"No messages deleted.", acc["host"])
-            self.log(f"Total messages scanned: " + str(msgs_total), acc["host"])
+                self.log("No messages deleted.", acc["host"])
+            self.log("Total messages scanned: " + str(msgs_total), acc["host"])
 
             grand_total += deleted_total
             grand_msgs_total += msgs_total
-
 
         return (len(account_fns), grand_total, grand_msgs_total)

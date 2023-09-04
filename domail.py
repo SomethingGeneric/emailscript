@@ -11,6 +11,8 @@ class cope:
         if do_discord:
             self.do_discord = True
             self.discord_url = open(".webhook").read().strip()
+        self.annoying = open("annoying").read().strip().split("\n")
+        self.annoying_senders = open("annoying_senders").read().strip().split("\n")
 
         self.annoying = open("annoying").read().strip().split("\n")
         self.annoying_senders = open("annoying_senders").read().strip().split("\n")
@@ -24,6 +26,18 @@ class cope:
                 url=self.discord_url, content=text, rate_limit_retry=True
             )
             webhook.execute()
+    
+    def forward_email(self, msg, reason):
+        self.log(f"Forwarding {str(msg.uid)} because of '{reason}'", msg.from_)
+        # Add code to forward the email here
+    
+    def delete_email(self, msg, reason):
+        self.log(f"Deleting {str(msg.uid)} because of '{reason}'", msg.from_)
+        self.log(f"Message info: {msg.subject} {msg.date_str} {msg.from_} {msg.uid}", msg.from_)
+        # Add code to delete the email here
+    
+    def log_message(self, msg, log_msg):
+        self.log(log_msg, msg.from_)
 
     def go(self):
         account_fns = []
@@ -52,54 +66,22 @@ class cope:
                     forwarded = False
                     for sender in forwarding_senders:
                         if sender in msg.from_:
-                            self.log(
-                                f"Forwarding {str(msg.uid)} because it was sent by '{sender}'",
-                                acc["host"],
-                            )
-                            # Add code to forward the email here
+                            self.forward_email(msg, f"it was sent by '{sender}'")
                             forwarded = True
                     for phrase in forwarding_subjects:
                         if phrase in msg.subject:
-                            self.log(
-                                f"Forwarding {str(msg.uid)} because of '{phrase}'",
-                                acc["host"],
-                            )
-                            # Add code to forward the email here
+                            self.forward_email(msg, f"because of '{phrase}'")
                             forwarded = True
                     for phrase in self.annoying:
                         if phrase in msg.subject and not forwarded:
-                            self.log(
-                                f"Deleting {str(msg.uid)} because of '{phrase}'",
-                                acc["host"],
-                            )
-                            self.log(
-                                f"Message info: {msg.subject} {msg.date_str} {msg.from_} {msg.uid}",
-                                acc["host"],
-                            )
-                            mailbox.delete(msg.uid)
+                            self.delete_email(msg, f"because of '{phrase}'")
                             deleted_total += 1
                     for sender in self.annoying_senders:
                         if sender in msg.from_ and not forwarded:
-                            self.log(
-                                f"Deleting {str(msg.uid)} b/c it was sent by '{sender}'",
-                                acc["host"],
-                            )
-                            self.log(
-                                f"Message info: {msg.subject} {msg.date_str} {msg.from_} {msg.uid}",
-                                acc["host"],
-                            )
-                            mailbox.delete(msg.uid)
+                            self.delete_email(msg, f"it was sent by '{sender}'")
                             deleted_total += 1
                     if not msg.subject.isascii():
-                        self.log(
-                            f"Deleting {str(msg.uid)} b/c it has weird characters.",
-                            acc["host"],
-                        )
-                        self.log(
-                            f"Message info: {msg.subject} {msg.date_str} {msg.from_} {msg.uid}",
-                            acc["host"],
-                        )
-                        mailbox.delete(msg.uid)
+                        self.delete_email(msg, f"it has weird characters.")
                         deleted_total += 1
             if deleted_total != 0:
                 self.log(f"Total deleted: {str(deleted_total)}", acc["host"])

@@ -19,20 +19,20 @@ class Cope:
         self.do_discord = False
         if do_discord:
             self.do_discord = True
-            with open(".webhook", encoding="utf-8").read().strip() as durl:
-                self.discord_url = durl
+            with open(".webhook", encoding="utf-8").read() as durl:
+                self.discord_url = durl.strip()
 
-        with open("annoying", encoding="utf-8").read().strip() as ann:
-            self.annoying = ann.split("\n")
+        with open("annoying", encoding="utf-8").read() as ann:
+            self.annoying = ann.strip().split("\n")
 
-        with open("annoying_senders", encoding="utf-8").read().strip() as senders:
-            self.annoying_senders = senders.split("\n")
+        with open("annoying_senders", encoding="utf-8").read() as senders:
+            self.annoying_senders = senders.strip().split("\n")
 
-        with open("forwarding_senders", encoding="utf-8").read().strip() as frdsndrs:
-            self.forwarding_senders = frdsndrs.split("\n")
+        with open("forwarding_senders", encoding="utf-8").read() as frdsndrs:
+            self.forwarding_senders = frdsndrs.strip().split("\n")
 
-        with open("forwarding_subjects", encoding="utf-8").read().strip() as fsubjs:
-            self.forwarding_subjects = fsubjs.split("\n")
+        with open("forwarding_subjects", encoding="utf-8").read() as fsubjs:
+            self.forwarding_subjects = fsubjs.strip().split("\n")
 
     def log(self, text, host):
         """Something worth noting from account <host>, sending to discord if enabled and to file."""

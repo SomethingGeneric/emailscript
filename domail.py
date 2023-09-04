@@ -36,6 +36,8 @@ class cope:
         for account_file in account_fns:
             acc = toml.load(account_file)
             print(f"Working on {acc['host']}")
+            forwarding_senders = open("forwarding_senders").read().strip().split("\n")
+            forwarding_subjects = open("forwarding_subjects").read().strip().split("\n")
 
             deleted_total = 0
             msgs_total = 0
@@ -46,8 +48,25 @@ class cope:
                 for msg in mailbox.fetch(reverse=True):
                     msgs_total += 1
                     print(msg.subject, msg.date_str, msg.from_, msg.uid)
-                    for phrase in self.annoying:
+                    forwarded = False
+                    for sender in forwarding_senders:
+                        if sender in msg.from_:
+                            self.log(
+                                f"Forwarding {str(msg.uid)} because it was sent by '{sender}'",
+                                acc["host"],
+                            )
+                            # Add code to forward the email here
+                            forwarded = True
+                    for phrase in forwarding_subjects:
                         if phrase in msg.subject:
+                            self.log(
+                                f"Forwarding {str(msg.uid)} because of '{phrase}'",
+                                acc["host"],
+                            )
+                            # Add code to forward the email here
+                            forwarded = True
+                    for phrase in self.annoying:
+                        if phrase in msg.subject and not forwarded:
                             self.log(
                                 f"Deleting {str(msg.uid)} because of '{phrase}'",
                                 acc["host"],
@@ -59,7 +78,7 @@ class cope:
                             mailbox.delete(msg.uid)
                             deleted_total += 1
                     for sender in self.annoying_senders:
-                        if sender in msg.from_:
+                        if sender in msg.from_ and not forwarded:
                             self.log(
                                 f"Deleting {str(msg.uid)} b/c it was sent by '{sender}'",
                                 acc["host"],

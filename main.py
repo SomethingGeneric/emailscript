@@ -11,4 +11,4 @@ if __name__ == "__main__":
         shutil.move("program.log", "program.log." + str(randint(1, 10000)))
 
     e = Cope()
-    e.process()
+    e.process_all()

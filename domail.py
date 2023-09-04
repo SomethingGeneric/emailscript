@@ -22,23 +22,17 @@ class Cope:
             with open(".webhook", encoding="utf-8").read().strip() as durl:
                 self.discord_url = durl
 
-        with open("annoying", encoding="utf-8").read().strip().split("\n") as ann:
-            self.annoying = ann
+        with open("annoying", encoding="utf-8").read().strip() as ann:
+            self.annoying = ann.split("\n")
 
-        with open("annoying_senders", encoding="utf-8").read().strip().split(
-            "\n"
-        ) as senders:
-            self.annoying_senders = senders
+        with open("annoying_senders", encoding="utf-8").read().strip() as senders:
+            self.annoying_senders = senders.split("\n")
 
-        with open("forwarding_senders", encoding="utf-8").read().strip().split(
-            "\n"
-        ) as frdsndrs:
-            self.forwarding_senders = frdsndrs
+        with open("forwarding_senders", encoding="utf-8").read().strip() as frdsndrs:
+            self.forwarding_senders = frdsndrs.split("\n")
 
-        with open("forwarding_subjects", encoding="utf-8").read().strip().split(
-            "\n"
-        ) as fsubjs:
-            self.forwarding_subjects = fsubjs
+        with open("forwarding_subjects", encoding="utf-8").read().strip() as fsubjs:
+            self.forwarding_subjects = fsubjs.split("\n")
 
     def log(self, text, host):
         """Something worth noting from account <host>, sending to discord if enabled and to file."""

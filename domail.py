@@ -1,7 +1,8 @@
-from imap_tools import MailBox
-from discord_webhook import DiscordWebhook
 import os
 import toml
+
+from imap_tools import MailBox
+from discord_webhook import DiscordWebhook
 
 
 class cope:

@@ -14,6 +14,7 @@ while True:
             "email": input("User login (sometimes your full address, check w/ host): "),
             "password": getpass(prompt="Password: "),
             "mb": input("Mailbox name (typically INBOX): "),
+            "forwarding_address": input("Forwarding email address (optional, leave blank if not needed): "),
         }
         datastr = toml.dumps(data)
         with open(f".account_{data['host']}", "w") as f:

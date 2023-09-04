@@ -4,3 +4,4 @@ __pycache__/
 .token
 .account_*
 *.log
+venv/
